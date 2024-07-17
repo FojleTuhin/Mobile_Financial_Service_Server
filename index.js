@@ -35,7 +35,7 @@ async function run() {
 
         const usersCollection = client.db('Mobile_Financial_Service').collection('users');
 
-
+        // jwt 
         app.post('/jwt', async (req, res) => {
             const user = req.body;
             const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
@@ -59,11 +59,11 @@ async function run() {
         }
 
 
-        app.post('/user',verifyToken, async (req, res) => {
+
+        // save user in database 
+        app.post('/user', async (req, res) => {
 
             const { name, email, number, pin, role } = req.body;
-
-
             const query = { number: number }
             const isExistingUser = await usersCollection.findOne(query);
 
@@ -89,6 +89,7 @@ async function run() {
         })
 
 
+        // check  password with hash password from database 
         app.post('/login', async (req, res) => {
             const { number, pin } = req.body;
             const query = { number: number };
@@ -118,6 +119,48 @@ async function run() {
                 res.status(500).json({ message: 'Internal server error' });
             }
         });
+
+
+        // check role for user 
+
+        app.get('/user/:number', async(req, res)=>{
+            const number = req.params.number;
+            console.log(number);
+            query= {number: number}
+            const result = await usersCollection.findOne(query);
+            res.send(result);
+        })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
