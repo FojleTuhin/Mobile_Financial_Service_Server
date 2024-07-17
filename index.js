@@ -132,6 +132,12 @@ async function run() {
         })
 
 
+        // get all user 
+        app.get('/allUser', async(req, res)=>{
+            const result = await usersCollection.find().toArray();
+            res.send(result);
+        })
+
 
 
 
