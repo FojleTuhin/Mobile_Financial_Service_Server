@@ -4,7 +4,7 @@ require('dotenv').config();
 const app = express();
 const port = process.env.port || 5000;
 const jwt = require('jsonwebtoken');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const bcrypt = require('bcryptjs');
 
 app.use(express.json());
@@ -138,6 +138,22 @@ async function run() {
             res.send(result);
         })
 
+        //update user status
+        app.patch('/activeUser/:id', async(req, res)=>{
+            const id= req.params.id;
+            const query = {_id : new ObjectId(id)};
+
+            const updateOne={
+                $set:{
+                    status:"active"
+                }
+            }
+            const result = await usersCollection.updateOne(query, updateOne);
+            res.send(result);
+
+        })
+
+    
 
 
 
