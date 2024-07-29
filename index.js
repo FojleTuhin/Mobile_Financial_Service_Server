@@ -123,29 +123,138 @@ async function run() {
 
         // check role for user 
 
-        app.get('/user/:number', async(req, res)=>{
+        app.get('/user/:number', async (req, res) => {
             const number = req.params.number;
             console.log(number);
-            query= {number: number}
+            query = { number: number }
             const result = await usersCollection.findOne(query);
             res.send(result);
         })
 
 
         // get all user 
-        app.get('/allUser', async(req, res)=>{
+        app.get('/allUser', async (req, res) => {
             const result = await usersCollection.find().toArray();
             res.send(result);
         })
 
-        //update user status
-        app.patch('/activeUser/:id', async(req, res)=>{
-            const id= req.params.id;
-            const query = {_id : new ObjectId(id)};
+        //update user status pending to active
+        // app.patch('/activeUser/:id', async (req, res) => {
+        //     const id = req.params.id;
+        //     let query;
 
-            const updateOne={
-                $set:{
-                    status:"active"
+        //     if (query = {
+        //         _id: new ObjectId(id),
+        //         status: 'pending',
+        //         role: 'Regular User'
+        //     }) {
+        //         const updateOne = {
+        //             $set: {
+        //                 status: "active",
+        //                 balance: 40
+        //             }
+        //         }
+        //         const result = await usersCollection.updateOne(query, updateOne);
+        //         res.send(result);
+        //     }
+
+        //     else if (
+        //         query = {
+        //             _id: new ObjectId(id),
+        //             status: 'pending',
+        //             role: 'Agent'
+        //         }
+        //     ) {
+        //         const updateOne = {
+        //             $set: {
+        //                 status: "active",
+        //                 balance: 10000
+        //             }
+        //         }
+        //         const result = await usersCollection.updateOne(query, updateOne);
+        //         res.send(result);
+        //     }
+
+        //     else {
+        //         query = { _id: new ObjectId(id) }
+        //         const updateOne = {
+        //             $set: {
+        //                 status: "active",
+        //             }
+        //         }
+        //         const result = await usersCollection.updateOne(query, updateOne);
+        //         res.send(result);
+        //     }
+
+
+
+        // })
+
+
+
+
+        app.patch('/activeUser/:id', async (req, res) => {
+            const id = req.params.id;
+            let query;
+            let updateOne;
+
+            // Check if the user is a pending Regular User
+            query = {
+                _id: new ObjectId(id),
+                status: 'pending',
+                role: 'Regular User'
+            };
+            let user = await usersCollection.findOne(query);
+            if (user) {
+                updateOne = {
+                    $set: {
+                        status: "active",
+                        balance: 40
+                    }
+                };
+                const result = await usersCollection.updateOne(query, updateOne);
+                return res.send(result);
+            }
+
+            // Check if the user is a pending Agent
+            query = {
+                _id: new ObjectId(id),
+                status: 'pending',
+                role: 'Agent'
+            };
+            user = await usersCollection.findOne(query);
+            if (user) {
+                updateOne = {
+                    $set: {
+                        status: "active",
+                        balance: 10000
+                    }
+                };
+                const result = await usersCollection.updateOne(query, updateOne);
+                return res.send(result);
+            }
+
+            // Default case: update status to active without changing balance
+            query = { _id: new ObjectId(id) };
+            updateOne = {
+                $set: {
+                    status: "active"
+                }
+            };
+            const result = await usersCollection.updateOne(query, updateOne);
+            res.send(result);
+        });
+
+
+
+        //update user status to block
+        app.patch('/blockUser/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+
+            const updateOne = {
+                $set: {
+                    status: "block"
                 }
             }
             const result = await usersCollection.updateOne(query, updateOne);
@@ -153,7 +262,7 @@ async function run() {
 
         })
 
-    
+
 
 
 
