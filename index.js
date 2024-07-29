@@ -134,61 +134,20 @@ async function run() {
 
         // get all user 
         app.get('/allUser', async (req, res) => {
-            const result = await usersCollection.find().toArray();
+            const search = req.query.search;
+            console.log(search);
+            const query = {
+                name: { $regex: search, $options: 'i' }
+            }
+            const result = await usersCollection.find(query).toArray();
             res.send(result);
         })
 
-        //update user status pending to active
-        // app.patch('/activeUser/:id', async (req, res) => {
-        //     const id = req.params.id;
-        //     let query;
-
-        //     if (query = {
-        //         _id: new ObjectId(id),
-        //         status: 'pending',
-        //         role: 'Regular User'
-        //     }) {
-        //         const updateOne = {
-        //             $set: {
-        //                 status: "active",
-        //                 balance: 40
-        //             }
-        //         }
-        //         const result = await usersCollection.updateOne(query, updateOne);
-        //         res.send(result);
-        //     }
-
-        //     else if (
-        //         query = {
-        //             _id: new ObjectId(id),
-        //             status: 'pending',
-        //             role: 'Agent'
-        //         }
-        //     ) {
-        //         const updateOne = {
-        //             $set: {
-        //                 status: "active",
-        //                 balance: 10000
-        //             }
-        //         }
-        //         const result = await usersCollection.updateOne(query, updateOne);
-        //         res.send(result);
-        //     }
-
-        //     else {
-        //         query = { _id: new ObjectId(id) }
-        //         const updateOne = {
-        //             $set: {
-        //                 status: "active",
-        //             }
-        //         }
-        //         const result = await usersCollection.updateOne(query, updateOne);
-        //         res.send(result);
-        //     }
 
 
 
-        // })
+
+        //update user status pending to active and also give bonus on first active
 
 
 
