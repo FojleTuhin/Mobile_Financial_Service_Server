@@ -63,7 +63,7 @@ async function run() {
         // save user in database 
         app.post('/user', async (req, res) => {
 
-            const { name, email, number, pin, role } = req.body;
+            const { name, email, number, pin, role, status } = req.body;
             const query = { number: number }
             const isExistingUser = await usersCollection.findOne(query);
 
@@ -81,7 +81,8 @@ async function run() {
                 email,
                 pin: secPin,
                 number,
-                role
+                role,
+                status
             }
             console.log(user);
             const result = await usersCollection.insertOne(user);
@@ -224,43 +225,102 @@ async function run() {
 
 
         //send money
-        app.post('/sendMoney', async(req, res)=>{
-            const sendMoney = req.body;
-            const {sender, receiver, money, password} = sendMoney;
-           
-            try{
-                const query = {number: sender}
-                const result = await usersCollection.findOne(query);
+        // app.post('/sendMoney', async(req, res)=>{
+        //     const sendMoney = req.body;
+        //     const {sender, receiver, money, password} = sendMoney;
+
+        //     try{
+        //         const query = {number: sender}
+        //         const result = await usersCollection.findOne(query);
 
 
-                const isMatch = await bcrypt.compare(password, result.pin);
+        //         const isMatch = await bcrypt.compare(password, result.pin);
+        //         if (!isMatch) {
+        //             return res.status(400).json({ message: 'Wrong password' });
+        //         } 
+
+
+        //         const searchReceiver = {
+        //             number: receiver,
+        //             role:'Regular User'
+        //         }
+        //         const filter = await usersCollection.findOne(searchReceiver);
+        //         if (!filter) {
+        //             console.log('User not found');
+        //             return res.status(400).json({ message: 'User not found' });
+        //         }else{
+        //             const updateReceiver = {
+        //                 $set: {
+        //                     balance : filter.balance + money
+        //                 }
+        //             }
+        //             const updateSender = {
+        //                 $set : {
+        //                     balance : result.balance - money
+        //                 }
+        //             }
+
+        //             const updateSend = await usersCollection.updateOne(result, updateSender);
+        //             res.send(updateSend);
+
+        //             const updateRec = await usersCollection.updateOne(filter, updateReceiver);
+        //             res.send(updateRec);
+        //         }
+        //     }catch(err){
+        //         console.error('Error during send money:', err);
+        //         res.status(500).json({ message: 'Internal server error' });
+        //     }
+        // })
+        app.post('/sendMoney', async (req, res) => {
+            const { sender, receiver, money, password } = req.body;
+
+            try {
+                // Find the sender
+                const senderQuery = { number: sender };
+                const senderResult = await usersCollection.findOne(senderQuery);
+
+                if (!senderResult) {
+                    return res.status(400).json({ message: 'Sender not found' });
+                }
+
+                // Check if the password matches
+                const isMatch = await bcrypt.compare(password, senderResult.pin);
                 if (!isMatch) {
                     return res.status(400).json({ message: 'Wrong password' });
-                } 
-
-
-                const searchReceiver = {
-                    number: receiver,
-                    role:'Regular User'
                 }
-                const filter = await usersCollection.findOne(searchReceiver);
-                if (!filter) {
-                    console.log('User not found');
-                    return res.status(400).json({ message: 'User not found' });
-                }else{
-                    console.log(filter);
+
+                // Find the receiver
+                const receiverQuery = { number: receiver, role: 'Regular User' };
+                const receiverResult = await usersCollection.findOne(receiverQuery);
+
+                if (!receiverResult) {
+                    return res.status(400).json({ message: 'Receiver not found' });
                 }
-                
 
+                // Update the sender's balance
+                const updateSender = {
+                    $set: {
+                        balance: senderResult.balance - money
+                    }
+                };
+                await usersCollection.updateOne(senderQuery, updateSender);
 
+                // Update the receiver's balance
+                const updateReceiver = {
+                    $set: {
+                        balance: receiverResult.balance + money
+                    }
+                };
+                await usersCollection.updateOne(receiverQuery, updateReceiver);
 
-                
+                // Send a success response
+                res.status(200).json({ message: 'Money sent successfully' });
 
-            }catch(err){
+            } catch (err) {
                 console.error('Error during send money:', err);
                 res.status(500).json({ message: 'Internal server error' });
             }
-        })
+        });
 
 
 
