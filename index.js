@@ -223,9 +223,44 @@ async function run() {
 
 
 
+        //send money
+        app.post('/sendMoney', async(req, res)=>{
+            const sendMoney = req.body;
+            const {sender, receiver, money, password} = sendMoney;
+           
+            try{
+                const query = {number: sender}
+                const result = await usersCollection.findOne(query);
+
+
+                const isMatch = await bcrypt.compare(password, result.pin);
+                if (!isMatch) {
+                    return res.status(400).json({ message: 'Wrong password' });
+                } 
+
+
+                const searchReceiver = {
+                    number: receiver,
+                    role:'Regular User'
+                }
+                const filter = await usersCollection.findOne(searchReceiver);
+                if (!filter) {
+                    console.log('User not found');
+                    return res.status(400).json({ message: 'User not found' });
+                }else{
+                    console.log(filter);
+                }
+                
 
 
 
+                
+
+            }catch(err){
+                console.error('Error during send money:', err);
+                res.status(500).json({ message: 'Internal server error' });
+            }
+        })
 
 
 
