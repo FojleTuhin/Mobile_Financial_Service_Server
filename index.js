@@ -272,7 +272,8 @@ async function run() {
         //     }
         // })
         app.post('/sendMoney', async (req, res) => {
-            const { sender, receiver, money, password } = req.body;
+            let { sender, receiver, money, password } = req.body;
+            
 
             try {
                 // Find the sender
@@ -304,6 +305,11 @@ async function run() {
                     }
                 };
                 await usersCollection.updateOne(senderQuery, updateSender);
+
+
+                if (money > 100) {
+                    money -= 5;
+                }
 
                 // Update the receiver's balance
                 const updateReceiver = {
