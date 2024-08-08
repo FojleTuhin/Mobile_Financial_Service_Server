@@ -404,6 +404,21 @@ async function run() {
             }
         });
 
+        app.get('/cashIn/:number', async (req, res) => {
+            const number = req.query.number;
+            
+        })
+
+
+
+
+
+
+
+
+
+
+
         app.patch('/ConfirmCashIn', async (req, res) => {
 
 
