@@ -409,13 +409,14 @@ async function run() {
 
 
         //Request for cash in for agent
-        app.get('/cashIn', async (req, res) => {
-            // const number = req.params.number;
-            // const query = { 
-            //     agent: number,
-            //     status: 'pending'
-            // };
-            const result = await transectionsCollection.find().toArray();
+        app.get('/cashIn/:agentNumber', async (req, res) => {
+            const agentNumber = req.params.agentNumber;
+            const query = { 
+                agent: agentNumber,
+                status: 'pending',
+                typeOfTransection: 'cash in'
+            };
+            const result = await transectionsCollection.find(query).toArray();
             res.send(result);
         })
 
