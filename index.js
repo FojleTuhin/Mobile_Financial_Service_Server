@@ -269,7 +269,7 @@ async function run() {
                 };
                 await usersCollection.updateOne(receiverQuery, updateReceiver);
                 const typeOfTransection = 'Send money';
-                const status= 'Done';
+                const status = 'Done';
 
                 const transection = {
                     money,
@@ -411,7 +411,7 @@ async function run() {
         // get all cash in request for agent
         app.get('/cashInRequest/:agentNumber', async (req, res) => {
             const agentNumber = req.params.agentNumber;
-            const query = { 
+            const query = {
                 agent: agentNumber,
                 status: 'pending',
                 typeOfTransection: 'cash in'
@@ -424,19 +424,19 @@ async function run() {
         // Cash in Transection management for Agent
         app.patch('/ConfirmCashIn/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await transectionsCollection.findOne(query);
-            const { money, receiver, agent} = result;
+            const { money, receiver, agent } = result;
 
 
 
             // Update the sender's balance(agent)
-            const searchAgentDetails = {number: agent};
+            const searchAgentDetails = { number: agent };
             const agentDetails = await usersCollection.findOne(searchAgentDetails);
 
             // check agent balance
-            if(agentDetails.balance < money){
-                return res.status(400).json({ message: 'No efficient balance'});
+            if (agentDetails.balance < money) {
+                return res.status(400).json({ message: 'No efficient balance' });
             }
             const updateAgentDetails = {
                 $set: {
@@ -448,9 +448,9 @@ async function run() {
 
             // Update the receiver's balance
 
-            const searchReceiverDetails = {number: receiver};
+            const searchReceiverDetails = { number: receiver };
             const receiverDetails = await usersCollection.findOne(searchReceiverDetails);
-            
+
             const updateReceiverDetails = {
                 $set: {
                     balance: receiverDetails.balance + money
@@ -459,9 +459,9 @@ async function run() {
             await usersCollection.updateOne(receiverDetails, updateReceiverDetails);
 
             //update status after receive money
-            const updateStatus ={
-                $set:{
-                    status:'done'
+            const updateStatus = {
+                $set: {
+                    status: 'done'
                 }
             }
             await transectionsCollection.updateOne(result, updateStatus);
@@ -475,7 +475,7 @@ async function run() {
         //get all cash in transection for admin
         app.get('/allCashInTransection', async (req, res) => {
             const query = {
-                typeOfTransection : 'cash in'
+                typeOfTransection: 'cash in'
             }
             const result = await transectionsCollection.find(query).toArray();
             res.send(result);
@@ -484,7 +484,7 @@ async function run() {
         //get all cash in transection for admin
         app.get('/allCashOutTransection', async (req, res) => {
             const query = {
-                typeOfTransection : 'Cash out'
+                typeOfTransection: 'Cash out'
             }
             const result = await transectionsCollection.find(query).toArray();
             res.send(result);
@@ -493,7 +493,7 @@ async function run() {
         //get all cash in transection for admin
         app.get('/allSendMoneyTransection', async (req, res) => {
             const query = {
-                typeOfTransection : 'Send money'
+                typeOfTransection: 'Send money'
             }
             const result = await transectionsCollection.find(query).toArray();
             res.send(result);
@@ -505,21 +505,59 @@ async function run() {
         app.get('/allCashInTransection/:agentNumber', async (req, res) => {
             const agentNumber = req.params.agentNumber;
             const query = {
-                typeOfTransection : 'cash in',
+                typeOfTransection: 'cash in',
                 agent: agentNumber
             }
             const result = await transectionsCollection.find(query).toArray();
             res.send(result);
         })
 
-        
+
 
         //get all cash in transection for a single agent
         app.get('/allCashOutTransection/:agentNumber', async (req, res) => {
             const agentNumber = req.params.agentNumber;
             const query = {
-                typeOfTransection : 'Cash out',
+                typeOfTransection: 'Cash out',
                 agent: agentNumber
+            }
+            const result = await transectionsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+
+
+        //get all cash in transection for a single regular user
+        app.get('/CashInTransection/:userNumber', async (req, res) => {
+            const userNumber = req.params.userNumber;
+            const query = {
+                typeOfTransection: 'cash in',
+                receiver: userNumber
+            }
+            const result = await transectionsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+
+
+        //get all cash in transection for a single regular user
+        app.get('/CashOutTransection/:userNumber', async (req, res) => {
+            const userNumber = req.params.userNumber;
+            const query = {
+                typeOfTransection: 'Cash out',
+                sender: userNumber
+            }
+            const result = await transectionsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+
+        //get all cash in transection for a single regular user
+        app.get('/SendMoneyTransection/:userNumber', async (req, res) => {
+            const userNumber = req.params.userNumber;
+            const query = {
+                typeOfTransection: 'Send money',
+                sender: userNumber
             }
             const result = await transectionsCollection.find(query).toArray();
             res.send(result);
