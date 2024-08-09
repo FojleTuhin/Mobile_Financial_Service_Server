@@ -471,6 +471,8 @@ async function run() {
         })
 
 
+
+        //get all cash in transection for admin
         app.get('/allCashInTransection', async (req, res) => {
             const query = {
                 typeOfTransection : 'cash in'
@@ -479,7 +481,7 @@ async function run() {
             res.send(result);
         })
 
-
+        //get all cash in transection for admin
         app.get('/allCashOutTransection', async (req, res) => {
             const query = {
                 typeOfTransection : 'Cash out'
@@ -488,7 +490,7 @@ async function run() {
             res.send(result);
         })
 
-
+        //get all cash in transection for admin
         app.get('/allSendMoneyTransection', async (req, res) => {
             const query = {
                 typeOfTransection : 'Send money'
@@ -499,6 +501,29 @@ async function run() {
 
 
 
+        //get all cash in transection for a single agent
+        app.get('/allCashInTransection/:agentNumber', async (req, res) => {
+            const agentNumber = req.params.agentNumber;
+            const query = {
+                typeOfTransection : 'cash in',
+                agent: agentNumber
+            }
+            const result = await transectionsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+        
+
+        //get all cash in transection for a single agent
+        app.get('/allCashOutTransection/:agentNumber', async (req, res) => {
+            const agentNumber = req.params.agentNumber;
+            const query = {
+                typeOfTransection : 'Cash out',
+                agent: agentNumber
+            }
+            const result = await transectionsCollection.find(query).toArray();
+            res.send(result);
+        })
 
 
 
