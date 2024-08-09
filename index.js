@@ -361,7 +361,7 @@ async function run() {
 
 
 
-        //request agent for cash in
+        //send request for cash in
         app.post('/cashIn', async (req, res) => {
             let { receiver, agent, money, password } = req.body;
 
@@ -408,8 +408,8 @@ async function run() {
 
 
 
-        //Request for cash in for agent
-        app.get('/cashIn/:agentNumber', async (req, res) => {
+        // get all cash in request for agent
+        app.get('/cashInRequest/:agentNumber', async (req, res) => {
             const agentNumber = req.params.agentNumber;
             const query = { 
                 agent: agentNumber,
@@ -430,37 +430,47 @@ async function run() {
 
 
         // Cash in Transection management for Agent
-        app.patch('/ConfirmCashIn', async (req, res) => {
+        app.patch('/ConfirmCashIn/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)};
+            const result = await transectionsCollection.findOne(query);
+            const { money, receiver, agent} = result;
 
 
-            // Update the sender's balance
-            // const updateSender = {
-            //     $set: {
-            //         balance: senderResult.balance - money
-            //     }
-            // };
-            // await usersCollection.updateOne(senderQuery, updateSender);
+
+            // Update the sender's balance(agent)
+            const searchAgentDetails = {number: agent};
+            const agentDetails = await usersCollection.findOne(searchAgentDetails);
+            const updateAgentDetails = {
+                $set: {
+                    balance: agentDetails.balance - money
+                }
+            };
+            await usersCollection.updateOne(agentDetails, updateAgentDetails);
 
 
-            // // Update the receiver's balance
-            // const updateReceiver = {
-            //     $set: {
-            //         balance: receiverResult.balance + money
-            //     }
-            // };
-            // await usersCollection.updateOne(receiverQuery, updateReceiver);
-            // const typeOfTransection = 'Cash out'
-            // const transection = {
-            //     money,
-            //     sender,
-            //     receiver,
-            //     typeOfTransection
+            // Update the receiver's balance
 
-            // }
-            // transectionsCollection.insertOne(transection);
+            const searchReceiverDetails = {number: receiver};
+            const receiverDetails = await usersCollection.findOne(searchReceiverDetails);
+            
+            const updateReceiverDetails = {
+                $set: {
+                    balance: receiverDetails.balance + money
+                }
+            };
+            await usersCollection.updateOne(receiverDetails, updateReceiverDetails);
 
-            // // Send a success response
-            // res.status(200).json({ message: 'Money sent successfully' });
+            //update status after receive money
+            const updateStatus ={
+                $set:{
+                    status:'done'
+                }
+            }
+            await transectionsCollection.updateOne(result, updateStatus);
+
+            // Send a success response
+            res.status(200).json({ message: 'Cash in successfully' });
         })
 
 
