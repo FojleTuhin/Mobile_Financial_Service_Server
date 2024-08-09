@@ -441,6 +441,11 @@ async function run() {
             // Update the sender's balance(agent)
             const searchAgentDetails = {number: agent};
             const agentDetails = await usersCollection.findOne(searchAgentDetails);
+
+            // check agent balance
+            if(agentDetails.balance < money){
+                return res.status(400).json({ message: 'No efficient balance'});
+            }
             const updateAgentDetails = {
                 $set: {
                     balance: agentDetails.balance - money
