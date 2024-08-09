@@ -421,14 +421,6 @@ async function run() {
         })
 
 
-
-
-
-
-
-
-
-
         // Cash in Transection management for Agent
         app.patch('/ConfirmCashIn/:id', async (req, res) => {
             const id = req.params.id;
@@ -479,7 +471,31 @@ async function run() {
         })
 
 
+        app.get('/allCashInTransection', async (req, res) => {
+            const query = {
+                typeOfTransection : 'cash in'
+            }
+            const result = await transectionsCollection.find(query).toArray();
+            res.send(result);
+        })
 
+
+        app.get('/allCashOutTransection', async (req, res) => {
+            const query = {
+                typeOfTransection : 'Cash out'
+            }
+            const result = await transectionsCollection.find(query).toArray();
+            res.send(result);
+        })
+
+
+        app.get('/allSendMoneyTransection', async (req, res) => {
+            const query = {
+                typeOfTransection : 'Send money'
+            }
+            const result = await transectionsCollection.find(query).toArray();
+            res.send(result);
+        })
 
 
 
