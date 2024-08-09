@@ -268,13 +268,15 @@ async function run() {
                     }
                 };
                 await usersCollection.updateOne(receiverQuery, updateReceiver);
-                const typeOfTransection = 'Send money'
+                const typeOfTransection = 'Send money';
+                const status= 'Done';
+
                 const transection = {
-                    status: 'Done',
                     money,
                     sender,
                     receiver,
-                    typeOfTransection
+                    typeOfTransection,
+                    status
 
                 }
                 transectionsCollection.insertOne(transection);
@@ -404,9 +406,17 @@ async function run() {
             }
         });
 
-        app.get('/cashIn/:number', async (req, res) => {
-            const number = req.query.number;
-            
+
+
+        //Request for cash in for agent
+        app.get('/cashIn', async (req, res) => {
+            // const number = req.params.number;
+            // const query = { 
+            //     agent: number,
+            //     status: 'pending'
+            // };
+            const result = await transectionsCollection.find().toArray();
+            res.send(result);
         })
 
 
@@ -418,7 +428,7 @@ async function run() {
 
 
 
-
+        // Cash in Transection management for Agent
         app.patch('/ConfirmCashIn', async (req, res) => {
 
 
