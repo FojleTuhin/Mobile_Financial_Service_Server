@@ -4,14 +4,16 @@ require('dotenv').config();
 const app = express();
 const port = process.env.port || 5000;
 const jwt = require('jsonwebtoken');
+
+
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const bcrypt = require('bcryptjs');
 
 app.use(express.json());
 
 app.use(cors({
-    origin: ["http://localhost:5173","https://mobilefinancialservice.netlify.app"]
-    // origin: "*"
+    // origin: ["http://localhost:5173","https://mobilefinancialservice.netlify.app"]
+    origin: "*"
 
 }))
 
@@ -137,10 +139,11 @@ async function run() {
         app.get('/allUser', async (req, res) => {
             const search = req.query.search;
             console.log(search);
-            const query = {
-                name: { $regex: search, $options: 'i' }
-            }
-            const result = await usersCollection.find(query).toArray();
+            // const query = {
+            //     name: { $regex: search, $options: 'i' }
+            // }
+            // const result = await usersCollection.find(query).toArray();
+            const result = await usersCollection.find().toArray();
             res.send(result);
         })
 
