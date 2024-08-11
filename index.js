@@ -13,7 +13,8 @@ app.use(express.json());
 
 app.use(cors({
     // origin: ["http://localhost:5173","https://mobilefinancialservice.netlify.app"]
-    origin: "*"
+    origin: "*",
+    credentials: true
 
 }))
 
@@ -119,7 +120,7 @@ async function run() {
                     res.status(400).json({ message: 'Invalid password' });
                 }
             } catch (err) {
-                console.error('Error during login:', err);
+                console.log('Error during login:', err);
                 res.status(500).json({ message: 'Internal server error' });
             }
         });
@@ -139,11 +140,11 @@ async function run() {
         app.get('/allUser', async (req, res) => {
             const search = req.query.search;
             console.log(search);
-            // const query = {
-            //     name: { $regex: search, $options: 'i' }
-            // }
-            // const result = await usersCollection.find(query).toArray();
-            const result = await usersCollection.find().toArray();
+            const query = {
+                name: { $regex: search, $options: 'i' }
+            }
+            const result = await usersCollection.find(query).toArray();
+            // const result = await usersCollection.find().toArray();
             res.send(result);
         })
 
