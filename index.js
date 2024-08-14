@@ -2,7 +2,9 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const app = express();
-const port = process.env.port || 5000;
+// const port = process.env.port || 5000;
+const port = process.env.PORT || 5000;
+
 const jwt = require('jsonwebtoken');
 
 
@@ -12,7 +14,7 @@ const bcrypt = require('bcryptjs');
 app.use(express.json());
 
 app.use(cors({
-    // origin: ["http://localhost:5173","https://mobilefinancialservice.netlify.app"]
+    // origin: ["http://localhost:5173","https://mobilefinancialservice.netlify.app"],
     origin: "*",
     credentials: true
 
@@ -129,7 +131,6 @@ async function run() {
         // check role for user 
         app.get('/user/:number', async (req, res) => {
             const number = req.params.number;
-            console.log(number);
             query = { number: number }
             const result = await usersCollection.findOne(query);
             res.send(result);
